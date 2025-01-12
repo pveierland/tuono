@@ -4,6 +4,7 @@ use axum::routing::{get, Router};
 use colored::Colorize;
 use ssr_rs::Ssr;
 use tower_http::services::ServeDir;
+use tower_http::{compression::CompressionLayer};
 
 use crate::{
     catch_all::catch_all, logger::LoggerLayer, vite_reverse_proxy::vite_reverse_proxy,
@@ -55,10 +56,18 @@ impl Server {
                 "  Production server at: {}\n",
                 "http://localhost:3000".blue().bold()
             );
+
+            let compression_layer: CompressionLayer = CompressionLayer::new()
+                .br(true)
+                .deflate(true)
+                .gzip(true)
+                .zstd(true);
+
             let router = self
                 .router
                 .to_owned()
                 .layer(LoggerLayer::new())
+                .layer(compression_layer)
                 .fallback_service(
                     ServeDir::new(PROD_PUBLIC_DIR)
                         .fallback(get(catch_all).layer(LoggerLayer::new())),
