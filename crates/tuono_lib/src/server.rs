@@ -4,6 +4,7 @@ use crate::mode::{Mode, GLOBAL_MODE};
 use axum::routing::{get, Router};
 use colored::Colorize;
 use ssr_rs::Ssr;
+use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
 use tuono_internal::config::Config;
 
@@ -78,10 +79,18 @@ impl Server {
                 "  Production server at: {}\n",
                 server_base_url.blue().bold()
             );
+
+            let compression_layer: CompressionLayer = CompressionLayer::new()
+                .br(true)
+                .deflate(true)
+                .gzip(true)
+                .zstd(true);
+
             let router = self
                 .router
                 .to_owned()
                 .layer(LoggerLayer::new())
+                .layer(compression_layer)
                 .fallback_service(
                     ServeDir::new(PROD_PUBLIC_DIR)
                         .fallback(get(catch_all).layer(LoggerLayer::new())),
