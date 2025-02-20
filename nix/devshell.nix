@@ -14,6 +14,7 @@
         nodejs
         openssl
         openssl.dev
+        pnpm
         self'.packages.tuono
         yarn
         yarn2nix

@@ -131,8 +131,11 @@ pub fn app() -> std::io::Result<()> {
                 let config = app.config.as_ref().unwrap();
 
                 while !is_server_ready {
-                    let server_url =
-                        format!("http://{}:{}", config.server.host, config.server.port);
+                    let server_url = match &config.server.origin {
+                        Some(origin) => origin.clone(),
+                        None => format!("http://{}:{}", config.server.host, config.server.port)
+                    };
+
                     if reqwest.get(server_url).send().is_ok() {
                         is_server_ready = true
                     }

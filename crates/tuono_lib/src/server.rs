@@ -26,6 +26,7 @@ pub struct Server {
     mode: Mode,
     pub listener: tokio::net::TcpListener,
     pub address: String,
+    pub base_url: String,
 }
 
 impl Server {
@@ -41,10 +42,16 @@ impl Server {
 
         let server_address = format!("{}:{}", config.server.host, config.server.port);
 
+        let server_base_url = match &config.server.origin {
+            Some(origin) => origin.clone(),
+            None => format!("http://{}", server_address),
+        };
+
         Server {
             router,
             mode,
             address: server_address.clone(),
+            base_url: server_base_url,
             listener: tokio::net::TcpListener::bind(&server_address)
                 .await
                 .expect("[SERVER] Failed to bind to address"),
@@ -56,10 +63,9 @@ impl Server {
          * Format the server address as a valid URL so that it becomes clickable in the CLI
          * @see https://github.com/tuono-labs/tuono/issues/460
          */
-        let server_base_url = format!("http://{}", self.address);
 
         if self.mode == Mode::Dev {
-            println!("  Ready at: {}\n", server_base_url.blue().bold());
+            println!("  Ready at: {}\n", self.base_url.blue().bold());
             let router = self
                 .router
                 .to_owned()
@@ -77,7 +83,7 @@ impl Server {
         } else {
             println!(
                 "  Production server at: {}\n",
-                server_base_url.blue().bold()
+                self.base_url.blue().bold()
             );
 
             let compression_layer: CompressionLayer = CompressionLayer::new()
