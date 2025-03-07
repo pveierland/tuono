@@ -3,6 +3,8 @@
   "description": "Basic tuono application",
   "version": "0.0.1",
   "dependencies": {
+    "@types/lodash": "^4.17.16",
+    "lodash": "^4.17.21",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tuono": "link:../../packages/tuono"
