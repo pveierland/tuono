@@ -2705,8 +2705,7 @@ dependencies = [
 [[package]]
 name = "ssr_rs"
 version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b27fcc1e644fc6591ce9172f04aa0d709a4bbf703a27a70ba5ef9e4851a049b"
+source = "git+https://github.com/pveierland/ssr-rs#cd67f2a28da7d1332dce7e35c9e7610d4bc8f058"
 dependencies = [
  "v8",
 ]
