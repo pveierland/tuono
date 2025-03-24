@@ -4,12 +4,16 @@ import { isEqual } from 'lodash';
 
 export const StateNavHelper = ({
   props,
+  routeName,
   title,
 }: {
   props: any,
+  routeName: string,
   title: string,
 }): JSX.Element => {
   const [propsStates, setPropsStates] = useState<any[]>([]);
+
+  console.log(routeName, props);
 
   useEffect(
     () => {

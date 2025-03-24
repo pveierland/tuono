@@ -16,6 +16,10 @@ export default function IndexPage(props: TuonoRouteProps<IndexProps>): JSX.Eleme
   }
 
   return (
-    <StateNavHelper props={props} title="Index" />
+    <StateNavHelper
+      props={props}
+      routeName="index"
+      title="Index"
+    />
   );
 }

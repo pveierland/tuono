@@ -1,9 +1,13 @@
 import { type JSX } from 'react'
-import { type TuonoProps } from 'tuono'
+import { type TuonoRouteProps } from 'tuono'
 import { StateNavHelper } from '../StateNavHelper';
 
-export default function TestRoute(props: TuonoProps<any>): JSX.Element {
+export default function TestRoute(props: TuonoRouteProps<any>): JSX.Element {
   return (
-    <StateNavHelper props={props} title={`Catch None: ${props?.data?.name}`} />
+    <StateNavHelper
+      props={props}
+      routeName="pokemon_catch_none_blastoise"
+      title={`Catch None: ${props?.data?.name}`}
+    />
   );
 }
