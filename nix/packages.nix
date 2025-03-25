@@ -31,6 +31,10 @@ in
         pname = "tuono-cargo-artifacts";
         version = "0.0.0";
 
+        buildInputs = [
+          pkgs.openssl
+        ];
+
         nativeBuildInputs = [
           pkgs.python3 # needed by v8 for download
         ];
@@ -38,9 +42,11 @@ in
         src = tuonoCraneLib.cleanCargoSource tuonoCargoWorkspacePath;
         strictDeps = true;
 
-        LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.openssl ];
         OPENSSL_DIR = "${pkgs.openssl.dev}";
         OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
+        OPENSSL_NO_VENDOR = "1";
+
+        RUSTFLAGS = "-L ${pkgs.openssl.out}/lib";
 
         RUSTY_V8_ARCHIVE =
           let
