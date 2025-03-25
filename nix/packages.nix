@@ -36,6 +36,7 @@ in
         ];
 
         nativeBuildInputs = [
+          pkgs.makeWrapper
           pkgs.python3 # needed by v8 for download
         ];
 
@@ -80,7 +81,7 @@ in
           pname = "tuono";
 
           postInstall = ''
-            ${pkgs.makeWrapper}/bin/wrapProgram $out/bin/tuono --set LD_LIBRARY_PATH "${lib.makeLibraryPath [ pkgs.openssl ]}"
+            wrapProgram $out/bin/tuono --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.openssl ]}
           '';
         }
       );
