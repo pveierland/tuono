@@ -39,6 +39,10 @@ in
           pkgs.python3 # needed by v8 for download
         ];
 
+        propagatedBuildInputs = [
+          pkgs.openssl
+        ];
+
         src = tuonoCraneLib.cleanCargoSource tuonoCargoWorkspacePath;
         strictDeps = true;
 
@@ -74,6 +78,10 @@ in
         // {
           cargoExtraArgs = "-p tuono --bin tuono";
           pname = "tuono";
+
+          postInstall = ''
+            ${pkgs.makeWrapper}/bin/wrapProgram $out/bin/tuono --set LD_LIBRARY_PATH "${lib.makeLibraryPath [ pkgs.openssl ]}"
+          '';
         }
       );
     in
