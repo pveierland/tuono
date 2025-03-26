@@ -4,7 +4,7 @@
 , ...
 }:
 let
-  tuonoCargoWorkspacePath = ../.;
+  tuonoCargoWorkspacePath = ./..;
 in
 {
   _class = "flake";
@@ -16,14 +16,10 @@ in
     , ...
     }:
     let
-      tuonoRustToolchain = (
-        inputs'.fenix.packages.combine [
-          (inputs'.fenix.packages.complete.withComponents [
-            "cargo"
-            "rustc"
-          ])
-        ]
-      );
+      tuonoRustToolchain = inputs'.fenix.packages.complete.withComponents [
+        "cargo"
+        "rustc"
+      ];
 
       tuonoCraneLib = (inputs.crane.mkLib pkgs).overrideToolchain tuonoRustToolchain;
 
@@ -31,17 +27,9 @@ in
         pname = "tuono-cargo-artifacts";
         version = "0.0.0";
 
-        buildInputs = [
-          pkgs.openssl
-        ];
-
         nativeBuildInputs = [
           pkgs.makeWrapper
           pkgs.python3 # needed by v8 for download
-        ];
-
-        propagatedBuildInputs = [
-          pkgs.openssl
         ];
 
         src = tuonoCraneLib.cleanCargoSource tuonoCargoWorkspacePath;
@@ -50,8 +38,6 @@ in
         OPENSSL_DIR = "${pkgs.openssl.dev}";
         OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
         OPENSSL_NO_VENDOR = "1";
-
-        RUSTFLAGS = "-L ${pkgs.openssl.out}/lib";
 
         RUSTY_V8_ARCHIVE =
           let
@@ -68,20 +54,21 @@ in
 
       tuonoCargoArtifacts = tuonoCraneLib.buildDepsOnly tuonoCargoArtifactsArgs;
 
-      tuonoCrateArgs = tuonoCargoArtifactsArgs // {
-        cargoArtifacts = tuonoCargoArtifacts;
-        doCheck = false;
-        version = "0.0.0";
-      };
-
       tuono = tuonoCraneLib.buildPackage (
-        tuonoCrateArgs
-        // {
-          cargoExtraArgs = "-p tuono --bin tuono";
+        tuonoCargoArtifactsArgs // {
           pname = "tuono";
+          version = "0.0.0";
+          doCheck = false;
+
+          cargoArtifacts = tuonoCargoArtifacts;
+          cargoExtraArgs = "-p tuono --bin tuono";
 
           postInstall = ''
-            wrapProgram $out/bin/tuono --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.openssl ]}
+            wrapProgram $out/bin/tuono \
+              --set OPENSSL_DIR ${pkgs.openssl.dev} \
+              --set OPENSSL_LIB_DIR ${pkgs.openssl.out}/lib \
+              --set OPENSSL_NO_VENDOR 1 \
+              --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.openssl ]}
           '';
         }
       );
